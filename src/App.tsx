@@ -87,12 +87,12 @@ function App() {
         }
 
         .main-header {
-          padding: 2rem;
+          padding: 1rem 1.5rem;
           display: flex;
           justify-content: space-between;
           align-items: flex-start;
           flex-wrap: wrap;
-          gap: 1.5rem;
+          gap: 1rem;
         }
 
         .header-left h1 {
@@ -163,7 +163,7 @@ function App() {
 
         .content-area {
           flex: 1;
-          padding: 0 2rem 2rem 2rem;
+          padding: 0 1.5rem 1.5rem 1.5rem;
           display: flex;
           flex-direction: column;
         }

@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import Sidebar from './components/layout/Sidebar';
 import ListView from './components/todo/ListView';
 import BoardView from './components/todo/BoardView';
+import TaskDetailSidebar from './components/todo/TaskDetailSidebar';
 import { useStore } from './store/useStore';
 import { LayoutGrid, List as ListIcon, Search } from 'lucide-react';
 
 function App() {
-  const { theme, activeListId, lists } = useStore();
+  const { theme, activeListId, lists, selectedTaskId } = useStore();
   const [viewMode, setViewMode] = useState<'list' | 'board'>('list');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -26,13 +28,27 @@ function App() {
       <Sidebar />
 
       <main className="main-content">
-        <header className="main-header">
-          <div className="header-left">
-            <h1>{activeList?.title || 'Tasks'}</h1>
+        <header className="main-header glass-effect">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="header-left"
+          >
+            <motion.h1
+              key={activeListId}
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              {activeList?.title || 'Tasks'}
+            </motion.h1>
             <p className="date-subtitle">{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
-          </div>
+          </motion.div>
 
-          <div className="header-right">
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="header-right"
+          >
             <div className="search-bar">
               <Search size={18} />
               <input
@@ -59,7 +75,7 @@ function App() {
                 <LayoutGrid size={18} />
               </button>
             </div>
-          </div>
+          </motion.div>
         </header>
 
         <section className="content-area">
@@ -70,6 +86,8 @@ function App() {
           )}
         </section>
       </main>
+
+      {selectedTaskId && <TaskDetailSidebar />}
 
       <style>{`
         .app-container {
@@ -93,6 +111,16 @@ function App() {
           align-items: flex-start;
           flex-wrap: wrap;
           gap: 1rem;
+          position: sticky;
+          top: 0;
+          z-index: 10;
+        }
+
+        .glass-effect {
+          background-color: rgba(var(--surface-rgb), 0.8);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          border-bottom: 1px solid var(--border);
         }
 
         .header-left h1 {
@@ -163,7 +191,7 @@ function App() {
 
         .content-area {
           flex: 1;
-          padding: 0 1.5rem 1.5rem 1.5rem;
+          padding: 1.5rem;
           display: flex;
           flex-direction: column;
         }

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Sun,
   Star,
@@ -66,25 +67,45 @@ const Sidebar: React.FC = () => {
         >
           <Menu size={24} />
         </button>
-        <div className="mobile-logo">ZenTask</div>
+        <div className="mobile-logo">ZenTodo</div>
       </div>
 
       {/* Mobile Backdrop */}
-      {isSidebarOpen && (
-        <div
-          className="sidebar-backdrop"
-          onClick={() => setIsSidebarOpen(false)}
-        />
-      )}
+      <AnimatePresence>
+        {isSidebarOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="sidebar-backdrop"
+            onClick={() => setIsSidebarOpen(false)}
+          />
+        )}
+      </AnimatePresence>
 
-      <aside className={`sidebar ${isSidebarOpen ? 'mobile-open' : ''} ${isMini ? 'mini' : ''}`}>
+      <motion.aside
+        className={`sidebar ${isSidebarOpen ? 'mobile-open' : ''} ${isMini ? 'mini' : ''}`}
+        animate={{
+          width: isMini ? 72 : 280,
+          x: (window.innerWidth <= 768 && !isSidebarOpen) ? -280 : 0
+        }}
+        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+      >
         <div className="sidebar-header">
-          {!isMini && (
-            <div className="logo">
-              <img src="/icons/icon-v1.svg" alt="ZenTodo" style={{ width: 24, height: 24 }} />
-              <span>ZenTodo</span>
-            </div>
-          )}
+          <AnimatePresence mode="wait">
+            {!isMini && (
+              <motion.div
+                key="logo"
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -10 }}
+                className="logo"
+              >
+                <img src="/icons/icon-v1.svg" alt="ZenTodo" style={{ width: 24, height: 24 }} />
+                <span>ZenTodo</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           <div className="header-actions">
             <button
@@ -92,7 +113,17 @@ const Sidebar: React.FC = () => {
               onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
               title="Toggle theme"
             >
-              {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={theme}
+                  initial={{ rotate: -90, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: 90, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+                </motion.div>
+              </AnimatePresence>
             </button>
 
             <button
@@ -127,7 +158,14 @@ const Sidebar: React.FC = () => {
                 <div className="item-icon-wrapper">
                   <item.icon size={18} style={{ color: item.color }} />
                 </div>
-                {!isMini && <span>{item.label}</span>}
+                {!isMini && (
+                  <motion.span
+                    initial={{ opacity: 0, x: -5 }}
+                    animate={{ opacity: 1, x: 0 }}
+                  >
+                    {item.label}
+                  </motion.span>
+                )}
               </button>
             ))}
           </div>
@@ -135,7 +173,15 @@ const Sidebar: React.FC = () => {
           <div className="nav-divider"></div>
 
           <div className="nav-group">
-            {!isMini && <div className="group-header">Custom Lists</div>}
+            {!isMini && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="group-header"
+              >
+                Custom Lists
+              </motion.div>
+            )}
             {lists.map((list) => (
               <div
                 key={list.id}
@@ -152,7 +198,14 @@ const Sidebar: React.FC = () => {
                   <div className="item-icon-wrapper">
                     <Hash size={18} style={{ color: list.color }} />
                   </div>
-                  {!isMini && <span>{list.title}</span>}
+                  {!isMini && (
+                    <motion.span
+                      initial={{ opacity: 0, x: -5 }}
+                      animate={{ opacity: 1, x: 0 }}
+                    >
+                      {list.title}
+                    </motion.span>
+                  )}
                 </button>
                 {!isMini && (
                   <button
@@ -171,7 +224,12 @@ const Sidebar: React.FC = () => {
         </nav>
 
         {!isMini && (
-          <form className="add-list-form" onSubmit={handleAddList}>
+          <motion.form
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="add-list-form"
+            onSubmit={handleAddList}
+          >
             <Plus size={18} />
             <input
               type="text"
@@ -179,7 +237,7 @@ const Sidebar: React.FC = () => {
               value={newListTitle}
               onChange={(e) => setNewListTitle(e.target.value)}
             />
-          </form>
+          </motion.form>
         )}
 
         <style>{`
@@ -228,18 +286,18 @@ const Sidebar: React.FC = () => {
             display: flex;
             flex-direction: column;
             height: 100vh;
-            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             z-index: 50;
             flex-shrink: 0;
+            overflow: hidden;
           }
 
-          .sidebar.mini {
-            width: 72px;
+          [data-theme='dark'] .sidebar {
+            background-color: #171718; /* Slightly lighter than pure bg */
           }
 
           .sidebar-header {
-            padding: 1.25rem 1rem;
+            padding: 1.25rem 0.75rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -249,13 +307,14 @@ const Sidebar: React.FC = () => {
           .header-actions {
             display: flex;
             align-items: center;
-            gap: 0.25rem;
+            gap: 0.125rem;
           }
 
           .sidebar.mini .header-actions {
             flex-direction: column;
             width: 100%;
-            gap: 0.75rem;
+            gap: 1.25rem;
+            margin-top: 0.5rem;
           }
 
           .logo {
@@ -263,6 +322,7 @@ const Sidebar: React.FC = () => {
             align-items: center;
             gap: 0.75rem;
             font-weight: 700;
+            font-family: var(--font-display);
             font-size: 1.15rem;
             color: var(--text);
             overflow: hidden;
@@ -431,20 +491,17 @@ const Sidebar: React.FC = () => {
             }
             .sidebar {
               position: fixed;
-              transform: translateX(-100%);
-              width: 280px !important;
+              left: 0;
+              width: 280px;
               border-radius: 0 var(--radius-xl) var(--radius-xl) 0;
-              box-shadow: 20px 0 50px rgba(0,0,0,0.1);
-            }
-            .sidebar.mobile-open {
-              transform: translateX(0);
+              box-shadow: 20px 0 50px rgba(0,0,0,0.2);
             }
             .sidebar-header {
                padding: 1.5rem 1rem;
             }
           }
         `}</style>
-      </aside>
+      </motion.aside>
     </>
   );
 };

@@ -1,109 +1,118 @@
 import React from 'react';
 import {
-    DragDropContext,
-    Droppable,
-    Draggable,
+  DragDropContext,
+  Droppable,
+  Draggable,
 } from '@hello-pangea/dnd';
 import type { DropResult } from '@hello-pangea/dnd';
 import { useStore } from '../../store/useStore';
-import type { Task } from '../../store/useStore';
 import { Check, Star } from 'lucide-react';
 
 const BoardView: React.FC = () => {
-    const { tasks, activeListId, updateTask, toggleComplete, toggleImportant } = useStore();
+  const { tasks, activeListId, updateTask, toggleComplete, toggleImportant } = useStore();
 
-    const filteredTasks = tasks.filter(task => {
-        if (activeListId === 'my-day') return task.myDay;
-        if (activeListId === 'important') return task.important;
-        if (activeListId === 'planned') return !!task.dueDate;
-        if (activeListId === 'tasks') return task.listId === 'tasks';
-        return task.listId === activeListId;
+  const filteredTasks = tasks.filter(task => {
+    if (activeListId === 'my-day') return task.myDay;
+    if (activeListId === 'important') return task.important;
+    if (activeListId === 'planned') return !!task.dueDate;
+    if (activeListId === 'tasks') return task.listId === 'tasks';
+    return task.listId === activeListId;
+  });
+
+  const columns = [
+    { id: 'todo', title: 'To Do', color: '#64748b' },
+    { id: 'in-progress', title: 'In Progress', color: '#3b82f6' },
+    { id: 'done', title: 'Done', color: '#10b981' }
+  ];
+
+  const onDragEnd = (result: DropResult) => {
+    const { destination, source, draggableId } = result;
+
+    if (!destination) return;
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index === source.index
+    ) return;
+
+    const newStatus = destination.droppableId as 'todo' | 'in-progress' | 'done';
+
+    updateTask(draggableId, {
+      status: newStatus,
+      completed: newStatus === 'done'
     });
+    // For a more robust reordering, we would also update 'order' here.
+  };
 
-    const columns = [
-        { id: 'todo', title: 'To Do', color: '#64748b' },
-        { id: 'in-progress', title: 'In Progress', color: '#3b82f6' },
-        { id: 'done', title: 'Done', color: '#10b981' }
-    ];
+  return (
+    <DragDropContext onDragEnd={onDragEnd}>
+      <div className="board-container">
+        {columns.map(column => (
+          <div key={column.id} className="board-column">
+            <h3 className="column-title" style={{ borderTop: `4px solid ${column.color}` }}>
+              {column.title}
+              <span className="count">{filteredTasks.filter(t => t.status === column.id).length}</span>
+            </h3>
 
-    const onDragEnd = (result: DropResult) => {
-        const { destination, source, draggableId } = result;
-
-        if (!destination) return;
-        if (
-            destination.droppableId === source.droppableId &&
-            destination.index === source.index
-        ) return;
-
-        const newStatus = destination.droppableId as 'todo' | 'in-progress' | 'done';
-
-        updateTask(draggableId, {
-            status: newStatus,
-            completed: newStatus === 'done'
-        });
-        // For a more robust reordering, we would also update 'order' here.
-    };
-
-    return (
-        <DragDropContext onDragEnd={onDragEnd}>
-            <div className="board-container">
-                {columns.map(column => (
-                    <div key={column.id} className="board-column">
-                        <h3 className="column-title" style={{ borderTop: `4px solid ${column.color}` }}>
-                            {column.title}
-                            <span className="count">{filteredTasks.filter(t => t.status === column.id).length}</span>
-                        </h3>
-
-                        <Droppable droppableId={column.id}>
-                            {(provided, snapshot) => (
-                                <div
-                                    ref={provided.innerRef}
-                                    {...provided.droppableProps}
-                                    className={`column-content ${snapshot.isDraggingOver ? 'dragging-over' : ''}`}
+            <Droppable droppableId={column.id}>
+              {(provided, snapshot) => (
+                <div
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                  className={`column-content ${snapshot.isDraggingOver ? 'dragging-over' : ''}`}
+                >
+                  {filteredTasks
+                    .filter(t => t.status === column.id)
+                    .sort((a, b) => a.order - b.order)
+                    .map((task, index) => {
+                      const isSelected = useStore.getState().selectedTaskId === task.id;
+                      return (
+                        <Draggable key={task.id} draggableId={task.id} index={index}>
+                          {(provided, snapshot) => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              className={`board-card ${snapshot.isDragging ? 'is-dragging' : ''} ${task.completed ? 'completed' : ''} ${isSelected ? 'selected' : ''}`}
+                              onClick={() => useStore.getState().setSelectedTaskId(task.id)}
+                            >
+                              <div className="card-header">
+                                <span className="card-title">{task.title}</span>
+                                <button
+                                  className={`star-btn ${task.important ? 'active' : ''}`}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    toggleImportant(task.id);
+                                  }}
                                 >
-                                    {filteredTasks
-                                        .filter(t => t.status === column.id)
-                                        .sort((a, b) => a.order - b.order)
-                                        .map((task, index) => (
-                                            <Draggable key={task.id} draggableId={task.id} index={index}>
-                                                {(provided, snapshot) => (
-                                                    <div
-                                                        ref={provided.innerRef}
-                                                        {...provided.draggableProps}
-                                                        {...provided.dragHandleProps}
-                                                        className={`board-card ${snapshot.isDragging ? 'is-dragging' : ''} ${task.completed ? 'completed' : ''}`}
-                                                    >
-                                                        <div className="card-header">
-                                                            <span className="card-title">{task.title}</span>
-                                                            <button
-                                                                className={`star-btn ${task.important ? 'active' : ''}`}
-                                                                onClick={() => toggleImportant(task.id)}
-                                                            >
-                                                                <Star size={14} fill={task.important ? 'var(--accent)' : 'none'} />
-                                                            </button>
-                                                        </div>
+                                  <Star size={14} fill={task.important ? 'var(--accent)' : 'none'} />
+                                </button>
+                              </div>
 
-                                                        <div className="card-footer">
-                                                            <button
-                                                                className={`complete-btn ${task.completed ? 'checked' : ''}`}
-                                                                onClick={() => toggleComplete(task.id)}
-                                                            >
-                                                                <Check size={12} />
-                                                                {task.completed ? 'Completed' : 'Mark Done'}
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </Draggable>
-                                        ))}
-                                    {provided.placeholder}
-                                </div>
-                            )}
-                        </Droppable>
-                    </div>
-                ))}
+                              <div className="card-footer">
+                                <button
+                                  className={`complete-btn ${task.completed ? 'checked' : ''}`}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    toggleComplete(task.id);
+                                  }}
+                                >
+                                  <Check size={12} />
+                                  {task.completed ? 'Completed' : 'Mark Done'}
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </Draggable>
+                      );
+                    })}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          </div>
+        ))}
 
-                <style>{`
+        <style>{`
           .board-container {
             display: flex;
             gap: 1.5rem;
@@ -166,6 +175,12 @@ const BoardView: React.FC = () => {
 
           .board-card:hover {
             border-color: var(--primary);
+            box-shadow: var(--shadow-md);
+          }
+
+          .board-card.selected {
+            border-color: var(--primary);
+            background-color: var(--surface);
             box-shadow: var(--shadow-md);
           }
 
@@ -232,9 +247,9 @@ const BoardView: React.FC = () => {
             }
           }
         `}</style>
-            </div>
-        </DragDropContext>
-    );
+      </div>
+    </DragDropContext>
+  );
 };
 
 export default BoardView;

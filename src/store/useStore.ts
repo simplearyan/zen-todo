@@ -1,6 +1,12 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+export interface Subtask {
+    id: string;
+    title: string;
+    completed: boolean;
+}
+
 export interface Task {
     id: string;
     title: string;
@@ -13,6 +19,7 @@ export interface Task {
     order: number;
     status: 'todo' | 'in-progress' | 'done';
     createdAt: number;
+    subtasks: Subtask[];
 }
 
 export interface List {
@@ -27,10 +34,12 @@ interface AppState {
     lists: List[];
     tasks: Task[];
     activeListId: string;
+    selectedTaskId: string | null;
 
     // Actions
     setTheme: (theme: 'light' | 'dark') => void;
     setActiveListId: (id: string) => void;
+    setSelectedTaskId: (id: string | null) => void;
 
     // List Actions
     addList: (title: string, color: string, icon: string) => void;
@@ -53,6 +62,7 @@ export const useStore = create<AppState>()(
             lists: [],
             tasks: [],
             activeListId: 'my-day',
+            selectedTaskId: null,
 
             setTheme: (theme) => {
                 set({ theme });
@@ -61,6 +71,8 @@ export const useStore = create<AppState>()(
 
             setActiveListId: (id) => set({ activeListId: id }),
 
+            setSelectedTaskId: (id) => set({ selectedTaskId: id }),
+
             addList: (title, color, icon) => set((state) => ({
                 lists: [...state.lists, { id: crypto.randomUUID(), title, color, icon }]
             })),
@@ -68,7 +80,8 @@ export const useStore = create<AppState>()(
             removeList: (id) => set((state) => ({
                 lists: state.lists.filter(l => l.id !== id),
                 tasks: state.tasks.filter(t => t.listId !== id),
-                activeListId: state.activeListId === id ? 'tasks' : state.activeListId
+                activeListId: state.activeListId === id ? 'tasks' : state.activeListId,
+                selectedTaskId: state.tasks.find(t => t.id === state.selectedTaskId && t.listId === id) ? null : state.selectedTaskId
             })),
 
             addTask: (title, listId) => set((state) => {
@@ -82,7 +95,8 @@ export const useStore = create<AppState>()(
                     listId: (listId === 'my-day' || listId === 'important' || listId === 'planned') ? 'tasks' : listId,
                     order: state.tasks.filter(t => t.listId === listId).length,
                     status: 'todo',
-                    createdAt: Date.now()
+                    createdAt: Date.now(),
+                    subtasks: []
                 };
 
                 // Handle special pseudo-lists

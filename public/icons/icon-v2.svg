@@ -1,0 +1,7 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+<defs><linearGradient id="grad_dark" x1="128" y1="128" x2="896" y2="896" gradientUnits="userSpaceOnUse"><stop stop-color="#1E293B" /><stop offset="1" stop-color="#0F172A" /></linearGradient></defs>
+<path d="M256 128H768C838.69 128 896 185.31 896 256V768C896 838.69 838.69 896 768 896H256C185.31 896 128 838.69 128 768V256C128 185.31 185.31 128 256 128Z" fill="url(#grad_dark)"/>
+<g >
+<path d="M384 512L480 608L640 416M320 320V704H704" stroke="#60A5FA" stroke-width="80" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</g>
+</svg>

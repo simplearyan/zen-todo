@@ -1,0 +1,6 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background path (Rounded Square) -->
+  <path id="bg" d="M256 128H768C838.69 128 896 185.31 896 256V768C896 838.69 838.69 896 768 896H256C185.31 896 128 838.69 128 768V256C128 185.31 185.31 128 256 128Z" fill="#3B82F6"/>
+  <!-- Logo path (Checkmark/Z hybrid) -->
+  <path id="logo" d="M384 512L480 608L640 416M320 320V704H704" stroke="white" stroke-width="80" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

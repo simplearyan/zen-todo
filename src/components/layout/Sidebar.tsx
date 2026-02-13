@@ -81,8 +81,8 @@ const Sidebar: React.FC = () => {
         <div className="sidebar-header">
           {!isMini && (
             <div className="logo">
-              <div className="logo-icon">ZT</div>
-              <span>ZenTask</span>
+              <img src="/icons/icon-v1.svg" alt="ZenTodo" style={{ width: 24, height: 24 }} />
+              <span>ZenTodo</span>
             </div>
           )}
 

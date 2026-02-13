@@ -101,7 +101,7 @@ const Sidebar: React.FC = () => {
                 exit={{ opacity: 0, x: -10 }}
                 className="logo"
               >
-                <img src="/icons/icon-v1.svg" alt="ZenTodo" style={{ width: 24, height: 24 }} />
+                <img src="./icons/icon-v1.svg" alt="ZenTodo" style={{ width: 24, height: 24 }} />
                 <span>ZenTodo</span>
               </motion.div>
             )}

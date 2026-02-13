@@ -27,16 +27,16 @@
 }
 
 [data-theme='dark'] {
-  --bg: #0f172a;
-  --surface: #1e293b;
-  --surface-hover: #334155;
-  --text: #f8fafc;
-  --text-muted: #94a3b8;
+  --bg: #141415;
+  --surface: #1e1e1f;
+  --surface-hover: #2a2a2b;
+  --text: #e2e2e4;
+  --text-muted: #a0a0a5;
   --primary: #60a5fa;
   --primary-hover: #3b82f6;
-  --primary-contrast: #0f172a;
+  --primary-contrast: #141415;
   --accent: #fbbf24;
-  --border: #334155;
+  --border: #2e2e30;
   --border-focus: #60a5fa;
   --error: #f87171;
   --success: #34d399;
@@ -59,7 +59,12 @@ body {
   min-height: 100vh;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-weight: 600;
   line-height: 1.2;
 }
@@ -72,7 +77,8 @@ button {
   background: none;
 }
 
-input, textarea {
+input,
+textarea {
   font-family: inherit;
   font-size: 1rem;
   border: 1px solid var(--border);
@@ -83,7 +89,8 @@ input, textarea {
   transition: var(--transition);
 }
 
-input:focus, textarea:focus {
+input:focus,
+textarea:focus {
   outline: none;
   border-color: var(--border-focus);
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);

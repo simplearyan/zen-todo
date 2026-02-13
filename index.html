@@ -6,6 +6,21 @@
     <link rel="apple-touch-icon" href="/icons/icon-v1-192.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
+    <!-- Theme Detection (Prevents flickering) -->
+    <script>
+      (function() {
+        try {
+          const storage = localStorage.getItem('zen-todo-storage');
+          if (storage) {
+            const state = JSON.parse(storage).state;
+            if (state && state.theme) {
+              document.documentElement.setAttribute('data-theme', state.theme);
+            }
+          }
+        } catch (e) {}
+      })();
+    </script>
+    
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
